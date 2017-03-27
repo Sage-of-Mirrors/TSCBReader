@@ -1,0 +1,3 @@
+[submodule "GameFormatReader"]
+	path = GameFormatReader
+	url = https://github.com/lioncash/GameFormatReader.git
