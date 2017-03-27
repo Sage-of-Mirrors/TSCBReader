@@ -50,6 +50,16 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GameFormatReader\GameFormatReader\GameFormatReader.csproj">
+      <Project>{afce536d-92ff-4ee5-8536-731d2cd5fbca}</Project>
+      <Name>GameFormatReader</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WArchive-Tools\ArchiveToolsLib\ArchiveToolsLib.csproj">
+      <Project>{b715685d-1603-4ce3-8ea1-552b01c2ba4b}</Project>
+      <Name>ArchiveToolsLib</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
