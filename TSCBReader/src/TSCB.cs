@@ -118,6 +118,8 @@ namespace TSCBReader.src
                     UnknownInt3 = reader.ReadInt32();
                     UnknownInt4 = reader.ReadInt32();
 
+                    // If this is 0, that means there are no extra ints at the end of the instance.
+                    // If we don't stop now, we'll get garbage data from the start of the next instance
                     if (UnknownInt1 == 0)
                         return;
 
