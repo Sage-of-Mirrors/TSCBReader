@@ -58,16 +58,15 @@ namespace TSCBReader.src
 
                 for (int i = 0; i < instanceCount; i++)
                 {
-                    long curPos = reader.BaseStream.Position;
-                    int instanceOffset = reader.PeekReadInt32();
+                    long curPos = reader.BaseStream.Position; // Store current position
+                    int instanceOffset = reader.PeekReadInt32(); // Peek-read the offset to the instance. We need to stay at this offset since the instance's offset is relative to it
 
-                    reader.BaseStream.Seek(instanceOffset, SeekOrigin.Current);
-
+                    reader.BaseStream.Seek(instanceOffset, SeekOrigin.Current); // Seek to instance
                     FirstSectionInstance inst = new FirstSectionInstance();
                     inst.Load(reader);
                     FirstSectionInstances.Add(inst);
 
-                    reader.BaseStream.Seek(curPos + 4, SeekOrigin.Begin);
+                    reader.BaseStream.Seek(curPos + 4, SeekOrigin.Begin); // Return to the offset block ready to read the next offset
                 }
 
                 reader.BaseStream.Seek(sectionStartPos + firstSectionSize, SeekOrigin.Begin);
@@ -108,11 +107,12 @@ namespace TSCBReader.src
                     UnknownFloat7 = reader.ReadSingle();
                     UnknownInt1 = reader.ReadInt32();
 
-                    m_stringOffset = reader.PeekReadInt32();
-                    long curPos = reader.BaseStream.Position;
-                    reader.BaseStream.Seek(m_stringOffset, SeekOrigin.Current);
-                    FileName = reader.ReadStringUntil('\0');
-                    reader.BaseStream.Seek(curPos + 4, SeekOrigin.Begin);
+                    // We'll load the file name from the string table at the end of the file
+                    m_stringOffset = reader.PeekReadInt32(); // Peek-read file name offset. We need to stay at the current offset, since the file name offset is relative to it.
+                    long curPos = reader.BaseStream.Position; // Save current position to come back later
+                    reader.BaseStream.Seek(m_stringOffset, SeekOrigin.Current); // Seek to the start of the file name from the current position
+                    FileName = reader.ReadStringUntil('\0'); // Read the file name until the null terminator
+                    reader.BaseStream.Seek(curPos + 4, SeekOrigin.Begin); // Return to the instance data at the field right after the file name offset
 
                     UnknownInt2 = reader.ReadInt32();
                     UnknownInt3 = reader.ReadInt32();
@@ -139,19 +139,19 @@ namespace TSCBReader.src
             {
                 SecondSectionInstances = new List<SecondSectionInstance>();
 
-                long basePos = reader.BaseStream.Position;
+                long basePos; // This will be the position of the stream within the offset block
 
                 for (int i = 0; i < sectionCount; i++)
                 {
-                    basePos = reader.BaseStream.Position;
-                    int instanceOffset = reader.ReadInt32();
-                    long nextInstOffset = reader.BaseStream.Position;
+                    basePos = reader.BaseStream.Position; // Update position in the offset block
+                    int instanceOffset = reader.ReadInt32(); // Read the instance offset
+                    long nextInstOffset = reader.BaseStream.Position; // Save the position to return to after reading instance data
 
                     reader.BaseStream.Seek(basePos + instanceOffset, SeekOrigin.Begin);
                     SecondSectionInstance inst = new SecondSectionInstance();
                     inst.Load(reader);
                     SecondSectionInstances.Add(inst);
-                    reader.BaseStream.Seek(nextInstOffset, SeekOrigin.Begin);
+                    reader.BaseStream.Seek(nextInstOffset, SeekOrigin.Begin); // Return to the next instance's offset so we can load it
                 }
             }
         }
